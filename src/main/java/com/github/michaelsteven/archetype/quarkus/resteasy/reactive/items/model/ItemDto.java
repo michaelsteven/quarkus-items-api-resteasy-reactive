@@ -1,22 +1,10 @@
 package com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.model;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
-import java.time.ZonedDateTime;
-
-import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
-
-import io.smallrye.mutiny.Multi;
-import io.smallrye.mutiny.Uni;
-import io.vertx.mutiny.mysqlclient.MySQLPool;
-import io.vertx.mutiny.sqlclient.Row;
-import io.vertx.mutiny.sqlclient.RowSet;
-import io.vertx.mutiny.sqlclient.Tuple;
 
 
 /**
@@ -45,7 +33,7 @@ public class ItemDto {
 	
 	/** The date submitted. */
 	@Schema(hidden = true)
-	private LocalDateTime dateSubmitted;
+	private Instant dateSubmitted;
 	
 	public ItemDto() {
 		
@@ -66,7 +54,7 @@ public class ItemDto {
         this.description = description;
     }
     
-    public ItemDto(Long id, String name, String description, LocalDateTime offsetDateTime) {
+    public ItemDto(Long id, String name, String description, Instant offsetDateTime) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -97,11 +85,11 @@ public class ItemDto {
 		this.description = description;
 	}
 
-	public LocalDateTime getDateSubmitted() {
+	public Instant getDateSubmitted() {
 		return dateSubmitted;
 	}
 
-	public void setDateSubmitted(LocalDateTime dateSubmitted) {
+	public void setDateSubmitted(Instant dateSubmitted) {
 		this.dateSubmitted = dateSubmitted;
 	}	
 }

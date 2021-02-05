@@ -12,7 +12,7 @@ The purpose of the quarkus-items-api-resteasy-reactive project is to provide an 
 
 - Need to fix getting the last identifier on the save
 - Need to implement the pageable interface to be consistant with the other examples
-- Uses the SQL Client without using the hibernate ORM
+- Uses the SQL Client without using the hibernate ORM. This code has some of the ORM stuff in it, but haven't been able to get it to work yet
 - localization currently only working with javax validation messages, localization of other strings, currency, and times need work
 - issue with openapi in showing the pageable as a sample needs to be fixed
 - need to find out how to properly use filters for logging since AOP for cross-cutting concerns doesn't seem to work.

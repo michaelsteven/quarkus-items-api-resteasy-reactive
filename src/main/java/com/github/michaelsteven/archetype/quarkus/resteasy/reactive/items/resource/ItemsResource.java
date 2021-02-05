@@ -26,7 +26,7 @@ import org.eclipse.microprofile.openapi.annotations.tags.Tag;
 
 import com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.model.ApiError;
 import com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.model.ItemDto;
-import com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.repository.ItemsRepository;
+import com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.service.ItemsService;
 
 import io.smallrye.mutiny.Multi;
 import io.smallrye.mutiny.Uni;
@@ -41,10 +41,9 @@ import io.smallrye.mutiny.Uni;
 @Consumes(MediaType.APPLICATION_JSON)
 public class ItemsResource {
 
-
-    /** The items repository. */
-    @Inject 
-    ItemsRepository itemsRepository;
+    
+    @Inject
+    ItemsService itemsService;
 
     
     /**
@@ -60,7 +59,7 @@ public class ItemsResource {
     	})
     @GET
     public Multi<ItemDto> getItems() {
-        return itemsRepository.findAll();
+        return itemsService.getItems();
     }
 
     
@@ -80,9 +79,11 @@ public class ItemsResource {
     @GET
     @Path("/{id}")
     public Uni<Response> getItemById(@PathParam("id") Long id) {
-        return itemsRepository.findById(id)
-                .onItem().transform(fruit -> fruit != null ? Response.ok(fruit) : Response.status(Status.NOT_FOUND))
-                .onItem().transform(ResponseBuilder::build);
+    	return itemsService.getItemById(id)
+    			.onItem()
+    			.transform(item -> item != null ? Response.ok(item) : Response.status(Status.NOT_FOUND))
+    			.onItem()
+    			.transform(ResponseBuilder::build);
     }
 
     
@@ -103,9 +104,16 @@ public class ItemsResource {
     	})
     @POST
     public Uni<Response> saveItem(@Valid ItemDto itemDto) {
-        return itemsRepository.save(itemDto)
-                .onItem().transform(id -> URI.create("/items/" + id))
-                .onItem().transform(uri -> Response.created(uri).build());
+    	
+    	return itemsService.saveItem(itemDto)
+    			           .onItem()
+    			           .transform(id -> URI.create("/items/" + id))
+    			           .onItem()
+    			           .transform(uri -> Response.created(uri).build());
+    			
+        //return itemsRepository.save(itemDto)
+        //        .onItem().transform(id -> URI.create("/items/" + id))
+        //        .onItem().transform(uri -> Response.created(uri).build());
     }
 
     
@@ -128,9 +136,16 @@ public class ItemsResource {
     @PUT
     @Path("/{id}")
     public Uni<Response> editItem(@PathParam("id") Long id, @Valid ItemDto itemDto) {
-        return itemsRepository.update(itemDto)
-                .onItem().transform(updated -> updated ? Status.OK : Status.NOT_FOUND)
-                .onItem().transform(status -> Response.status(status).build());
+    	return Uni.createFrom()
+    			.item(Status.OK)
+    			.invoke( () -> {itemsService.editItem(itemDto); })
+    			.onItem()
+    			.transform(status -> Response.status(status).build());
+    			
+    	
+       // return itemsRepository.update(itemDto)
+       //         .onItem().transform(updated -> updated ? Status.OK : Status.NOT_FOUND)
+       //         .onItem().transform(status -> Response.status(status).build());
     }
 
     
@@ -149,8 +164,15 @@ public class ItemsResource {
     @DELETE
     @Path("/{id}")
     public Uni<Response> deleteById(@PathParam("id") Long id) {
-        return itemsRepository.delete(id)
-                .onItem().transform(deleted -> deleted ? Status.NO_CONTENT : Status.NOT_FOUND)
-                .onItem().transform(status -> Response.status(status).build());
+    	return Uni.createFrom()
+    			  .item(Status.NO_CONTENT)
+    			  .invoke( () -> {
+    				  	itemsService.deleteItemById(id); })
+    			  .onItem()
+    			  .transform( status -> Response.status(status).build());
+    	
+       // return itemsRepository.delete(id)
+        //        .onItem().transform(deleted -> deleted ? Status.NO_CONTENT : Status.NOT_FOUND)
+       //         .onItem().transform(status -> Response.status(status).build());
     }
 }

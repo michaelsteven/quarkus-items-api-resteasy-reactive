@@ -1,5 +1,8 @@
 package com.github.michaelsteven.archetype.quarkus.resteasy.reactive.items.repository;
 
+import java.time.Instant;
+import java.time.ZoneOffset;
+
 import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Inject;
 import javax.validation.Valid;
@@ -74,7 +77,7 @@ public class ItemsRepository {
      * @return the uni
      */
     public Uni<Boolean> update(@Valid ItemDto itemDto) {
-        return client.preparedQuery("UPDATE items SET name = ? WHERE id = ?").execute(Tuple.of(itemDto.getName(), itemDto.getDescription()))
+        return client.preparedQuery("UPDATE items SET name = ?, description =? WHERE id = ?").execute(Tuple.of(itemDto.getName(), itemDto.getDescription(), itemDto.getId()))
                 .onItem().transform(pgRowSet -> pgRowSet.rowCount() == 1);
     }
 
@@ -96,6 +99,11 @@ public class ItemsRepository {
      * @return the item dto
      */
     private static ItemDto from(Row row) {
-        return new ItemDto(row.getLong("id"), row.getString("name"), row.getString("description"), row.getLocalDateTime("created_ts"));
+        return new ItemDto(
+        		row.getLong("id"), 
+        		row.getString("name"), 
+        		row.getString("description"), 
+        		row.getLocalDateTime("created_ts") != null ? row.getLocalDateTime("created_ts").toInstant(ZoneOffset.UTC) : null
+        );
     }
 }
